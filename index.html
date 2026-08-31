@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Search Engine Tags -->
+    <title>Tic-Tac-Toe  - Play Free Online Game</title>
+    <meta name="title" content="Tic-Tac-Toe  - Play Free Online Game">
+    <meta name="description" content="Play free online Tic-Tac-Toe game against an unbeatable AI or challenge friends locally. Features multiple difficulty levels: Easy, Medium, and Unbeatable.">
+    <meta name="keywords" content="tic tac toe, play tic tac toe, tic tac toe , free browser games, minimax tic tac toe, 2 player games online">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Tic-Tac-Toe Web App">
+
+    <!-- Open Graph / Facebook / WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tic-Tac-Toe  - Play Free Online Game">
+    <meta property="og:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
+
+    <!-- Twitter Preview -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Tic-Tac-Toe  - Play Free Online Game">
+    <meta property="twitter:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-x: #38bdf8;
+            --accent-o: #f43f5e;
+            --grid-line: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 2rem;
+        }
+
+        .controls {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        select, button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background-color: #334155;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover, select:hover {
+            background-color: #475569;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.2rem 0;
+            height: 1.5rem;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .cell:hover {
+            background-color: #1e293b;
+        }
+
+        .cell.x {
+            color: var(--accent-x);
+        }
+
+        .cell.o {
+            color: var(--accent-o);
+        }
+
+        .reset-btn {
+            background-color: var(--accent-x);
+            color: #0f172a;
+            font-weight: bold;
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .reset-btn:hover {
+            background-color: #7dd3fc;
+        }
+
+        /* SEO Footer Text */
+        .seo-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 1.5rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tic-Tac-Toe </h1>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="gameMode">Mode:</label>
+            <select id="gameMode">
+                <option value="ai">vs AI</option>
+                <option value="pvp">vs Player (Local)</option>
+            </select>
+        </div>
+
+        <div class="control-group" id="difficultyGroup">
+            <label for="difficulty">Difficulty:</label>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard" selected>Unbeatable</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="status" id="status">Player X's Turn</div>
+
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">Restart Game</button>
+
+    <!-- SEO text block helps web crawlers categorize the page -->
+    <p class="seo-text">
+        Play free online Tic-Tac-Toe in your browser. Test your strategy against our Smart Minimax AI or play locally in 2-player mode.
+    </p>
+</div>
+
+<script>
+    const cells = document.querySelectorAll('.cell');
+    const statusElement = document.getElementById('status');
+    const resetBtn = document.getElementById('resetBtn');
+    const gameModeSelect = document.getElementById('gameMode');
+    const difficultySelect = document.getElementById('difficulty');
+    const difficultyGroup = document.getElementById('difficultyGroup');
+
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let isGameActive = true;
+
+    const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+
+    function handleCellClick(e) {
+        const index = e.target.getAttribute('data-index');
+
+        if (board[index] !== '' || !isGameActive) return;
+
+        makeMove(index, currentPlayer);
+
+        if (isGameActive && gameModeSelect.value === 'ai' && currentPlayer === 'O') {
+            setTimeout(makeAIMove, 300);
+        }
+    }
+
+    function makeMove(index, player) {
+        board[index] = player;
+        cells[index].textContent = player;
+        cells[index].classList.add(player.toLowerCase());
+
+        if (checkWin(board, player)) {
+            statusElement.textContent = `Player ${player} Wins!`;
+            isGameActive = false;
+            return;
+        }
+
+        if (board.every(cell => cell !== '')) {
+            statusElement.textContent = "It's a Draw!";
+            isGameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusElement.textContent = `Player ${currentPlayer}'s Turn`;
+    }
+
+    function makeAIMove() {
+        const level = difficultySelect.value;
+        let moveIndex;
+
+        if (level === 'easy') {
+            moveIndex = getRandomMove();
+        } else if (level === 'medium') {
+            moveIndex = Math.random() < 0.5 ? getBestMove() : getRandomMove();
+        } else {
+            moveIndex = getBestMove();
+        }
+
+        if (moveIndex !== null && moveIndex !== undefined) {
+            makeMove(moveIndex, 'O');
+        }
+    }
+
+    function getRandomMove() {
+        const availableSpots = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+        if (availableSpots.length === 0) return null;
+        return availableSpots[Math.floor(Math.random() * availableSpots.length)];
+    }
+
+    function checkWin(currentBoard, player) {
+        return winPatterns.some(pattern => {
+            return pattern.every(index => currentBoard[index] === player);
+        });
+    }
+
+    function minimax(newBoard, depth, isMaximizing) {
+        if (checkWin(newBoard, 'O')) return { score: 10 - depth };
+        if (checkWin(newBoard, 'X')) return { score: depth - 10 };
+        if (newBoard.every(cell => cell !== '')) return { score: 0 };
+
+        const availSpots = newBoard.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+        const moves = [];
+
+        for (let i = 0; i < availSpots.length; i++) {
+            const move = {};
+            move.index = availSpots[i];
+            newBoard[availSpots[i]] = isMaximizing ? 'O' : 'X';
+
+            if (isMaximizing) {
+                const result = minimax(newBoard, depth + 1, false);
+                move.score = result.score;
+            } else {
+                const result = minimax(newBoard, depth + 1, true);
+                move.score = result.score;
+            }
+
+            newBoard[availSpots[i]] = '';
+            moves.push(move);
+        }
+
+        let bestMove;
+        if (isMaximizing) {
+            let bestScore = -10000;
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        } else {
+            let bestScore = 10000;
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].score < bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        }
+
+        return moves[bestMove];
+    }
+
+    function getBestMove() {
+        const best = minimax(board, 0, true);
+        return best ? best.index : getRandomMove();
+    }
+
+    function resetGame() {
+        board = ['', '', '', '', '', '', '', '', ''];
+        currentPlayer = 'X';
+        isGameActive = true;
+        statusElement.textContent = "Player X's Turn";
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('x', 'o');
+        });
+    }
+
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    resetBtn.addEventListener('click', resetGame);
+
+    gameModeSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'pvp') {
+            difficultyGroup.style.display = 'none';
+        } else {
+            difficultyGroup.style.display = 'flex';
+        }
+        resetGame();
+    });
+
+    difficultySelect.addEventListener('change', resetGame);
+</script>
+</body>
+</html>
