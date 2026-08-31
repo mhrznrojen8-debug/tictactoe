@@ -5,31 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary Search Engine Tags -->
-    <title>Tic-Tac-Toe  - Play Free Online Game</title>
-    <meta name="title" content="Tic-Tac-Toe  - Play Free Online Game">
-    <meta name="description" content="Play free online Tic-Tac-Toe game against an unbeatable AI or challenge friends locally. Features multiple difficulty levels: Easy, Medium, and Unbeatable.">
-    <meta name="keywords" content="tic tac toe, play tic tac toe, tic tac toe , free browser games, minimax tic tac toe, 2 player games online">
+    <title>Tic-Tac-Toe AI - Play Free Online Game</title>
+    <meta name="title" content="Tic-Tac-Toe AI - Play Free Online Game">
+    <meta name="description" content="Play free online Tic-Tac-Toe game against an unbeatable AI or challenge friends locally. Features score tracking, themes, sound effects, and multiple difficulty levels.">
+    <meta name="keywords" content="tic tac toe, play tic tac toe, tic tac toe ai, free browser games, minimax tic tac toe, 2 player games online">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Tic-Tac-Toe Web App">
 
-    <!-- Open Graph / Facebook / WhatsApp Preview -->
+    <!-- Open Graph / Social Media Preview -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Tic-Tac-Toe  - Play Free Online Game">
+    <meta property="og:title" content="Tic-Tac-Toe AI - Play Free Online Game">
     <meta property="og:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
 
-    <!-- Twitter Preview -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Tic-Tac-Toe  - Play Free Online Game">
-    <meta property="twitter:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
-
     <style>
-        :root {
+        /* Theme Variables */
+        :root[data-theme="dark"] {
             --bg-color: #0f172a;
             --card-bg: #1e293b;
             --text-color: #f8fafc;
+            --subtext-color: #94a3b8;
             --accent-x: #38bdf8;
             --accent-o: #f43f5e;
-            --grid-line: #334155;
+            --button-bg: #334155;
+            --button-hover: #475569;
+            --cell-hover: #2d3748;
+        }
+
+        :root[data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --subtext-color: #64748b;
+            --accent-x: #0284c7;
+            --accent-o: #e11d48;
+            --button-bg: #e2e8f0;
+            --button-hover: #cbd5e1;
+            --cell-hover: #f8fafc;
+        }
+
+        :root[data-theme="neon"] {
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --text-color: #00ffcc;
+            --subtext-color: #ff00ff;
+            --accent-x: #00ffff;
+            --accent-o: #ff0055;
+            --button-bg: #222222;
+            --button-hover: #333333;
+            --cell-hover: #1a1a1a;
         }
 
         body {
@@ -41,6 +64,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
@@ -49,13 +73,36 @@
             border-radius: 1rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
+            transition: background-color 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
         h1 {
-            margin-top: 0;
-            font-size: 2rem;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: var(--button-bg);
+            border: none;
+            color: var(--text-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
         .controls {
@@ -73,28 +120,51 @@
 
         label {
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: var(--subtext-color);
         }
 
         select, button {
             padding: 8px 12px;
             border-radius: 6px;
             border: none;
-            background-color: #334155;
-            color: white;
+            background-color: var(--button-bg);
+            color: var(--text-color);
             font-size: 0.9rem;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         button:hover, select:hover {
-            background-color: #475569;
+            background-color: var(--button-hover);
+        }
+
+        /* Score Tracker */
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--button-bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+            color: var(--subtext-color);
+        }
+
+        .score-item span {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
         }
 
         .status {
             font-size: 1.2rem;
             font-weight: 600;
-            margin: 1.2rem 0;
+            margin: 1rem 0;
             height: 1.5rem;
         }
 
@@ -120,43 +190,52 @@
         }
 
         .cell:hover {
-            background-color: #1e293b;
+            background-color: var(--cell-hover);
         }
 
-        .cell.x {
-            color: var(--accent-x);
-        }
+        .cell.x { color: var(--accent-x); }
+        .cell.o { color: var(--accent-o); }
 
-        .cell.o {
-            color: var(--accent-o);
+        .action-btns {
+            display: flex;
+            gap: 10px;
         }
 
         .reset-btn {
             background-color: var(--accent-x);
             color: #0f172a;
             font-weight: bold;
-            width: 100%;
+            flex: 2;
             padding: 12px;
             font-size: 1rem;
         }
 
-        .reset-btn:hover {
-            background-color: #7dd3fc;
+        .reset-score-btn {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            flex: 1;
+            padding: 12px;
+            font-size: 0.85rem;
         }
 
-        /* SEO Footer Text */
         .seo-text {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--subtext-color);
             margin-top: 1.5rem;
             line-height: 1.4;
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <div class="container">
-    <h1>Tic-Tac-Toe </h1>
+    <div class="header">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="top-controls">
+            <button class="icon-btn" id="soundBtn" title="Toggle Sound">🔊</button>
+            <button class="icon-btn" id="themeBtn" title="Switch Theme">🎨</button>
+        </div>
+    </div>
     
     <div class="controls">
         <div class="control-group">
@@ -177,6 +256,13 @@
         </div>
     </div>
 
+    <!-- Score Board -->
+    <div class="scoreboard">
+        <div class="score-item">Player X <span id="scoreX">0</span></div>
+        <div class="score-item">Ties <span id="scoreTies">0</span></div>
+        <div class="score-item">Player O <span id="scoreO">0</span></div>
+    </div>
+
     <div class="status" id="status">Player X's Turn</div>
 
     <div class="board" id="board">
@@ -191,11 +277,13 @@
         <div class="cell" data-index="8"></div>
     </div>
 
-    <button class="reset-btn" id="resetBtn">Restart Game</button>
+    <div class="action-btns">
+        <button class="reset-btn" id="resetBtn">Restart Game</button>
+        <button class="reset-score-btn" id="resetScoreBtn">Reset Score</button>
+    </div>
 
-    <!-- SEO text block helps web crawlers categorize the page -->
     <p class="seo-text">
-        Play free online Tic-Tac-Toe in your browser. Test your strategy against our Smart Minimax AI or play locally in 2-player mode.
+        Play free online Tic-Tac-Toe with customizable themes, session score tracking, and an intelligent Minimax AI opponent.
     </p>
 </div>
 
@@ -203,13 +291,25 @@
     const cells = document.querySelectorAll('.cell');
     const statusElement = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
+    const resetScoreBtn = document.getElementById('resetScoreBtn');
     const gameModeSelect = document.getElementById('gameMode');
     const difficultySelect = document.getElementById('difficulty');
     const difficultyGroup = document.getElementById('difficultyGroup');
+    
+    const scoreXEl = document.getElementById('scoreX');
+    const scoreOEl = document.getElementById('scoreO');
+    const scoreTiesEl = document.getElementById('scoreTies');
+    const themeBtn = document.getElementById('themeBtn');
+    const soundBtn = document.getElementById('soundBtn');
 
     let board = ['', '', '', '', '', '', '', '', ''];
     let currentPlayer = 'X';
     let isGameActive = true;
+    let soundEnabled = true;
+    
+    let scores = { X: 0, O: 0, ties: 0 };
+    const themes = ['dark', 'light', 'neon'];
+    let currentThemeIdx = 0;
 
     const winPatterns = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -217,9 +317,47 @@
         [0, 4, 8], [2, 4, 6]
     ];
 
+    // Web Audio API Synthesizer (No external audio files required)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+        if (!soundEnabled) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'move') {
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === 'win') {
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.setValueAtTime(500, now + 0.1);
+            osc.frequency.setValueAtTime(700, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        } else if (type === 'draw') {
+            osc.frequency.setValueAtTime(250, now);
+            osc.frequency.setValueAtTime(180, now + 0.15);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+    }
+
     function handleCellClick(e) {
         const index = e.target.getAttribute('data-index');
-
         if (board[index] !== '' || !isGameActive) return;
 
         makeMove(index, currentPlayer);
@@ -233,21 +371,34 @@
         board[index] = player;
         cells[index].textContent = player;
         cells[index].classList.add(player.toLowerCase());
+        playSound('move');
 
         if (checkWin(board, player)) {
             statusElement.textContent = `Player ${player} Wins!`;
             isGameActive = false;
+            scores[player]++;
+            updateScoreUI();
+            playSound('win');
             return;
         }
 
         if (board.every(cell => cell !== '')) {
             statusElement.textContent = "It's a Draw!";
             isGameActive = false;
+            scores.ties++;
+            updateScoreUI();
+            playSound('draw');
             return;
         }
 
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
         statusElement.textContent = `Player ${currentPlayer}'s Turn`;
+    }
+
+    function updateScoreUI() {
+        scoreXEl.textContent = scores.X;
+        scoreOEl.textContent = scores.O;
+        scoreTiesEl.textContent = scores.ties;
     }
 
     function makeAIMove() {
@@ -274,9 +425,7 @@
     }
 
     function checkWin(currentBoard, player) {
-        return winPatterns.some(pattern => {
-            return pattern.every(index => currentBoard[index] === player);
-        });
+        return winPatterns.some(pattern => pattern.every(index => currentBoard[index] === player));
     }
 
     function minimax(newBoard, depth, isMaximizing) {
@@ -292,13 +441,8 @@
             move.index = availSpots[i];
             newBoard[availSpots[i]] = isMaximizing ? 'O' : 'X';
 
-            if (isMaximizing) {
-                const result = minimax(newBoard, depth + 1, false);
-                move.score = result.score;
-            } else {
-                const result = minimax(newBoard, depth + 1, true);
-                move.score = result.score;
-            }
+            const result = minimax(newBoard, depth + 1, !isMaximizing);
+            move.score = result.score;
 
             newBoard[availSpots[i]] = '';
             moves.push(move);
@@ -342,15 +486,29 @@
         });
     }
 
+    // Toggle Sound
+    soundBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    // Toggle Themes
+    themeBtn.addEventListener('click', () => {
+        currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+        document.body.setAttribute('data-theme', themes[currentThemeIdx]);
+    });
+
+    // Reset Scores
+    resetScoreBtn.addEventListener('click', () => {
+        scores = { X: 0, O: 0, ties: 0 };
+        updateScoreUI();
+    });
+
     cells.forEach(cell => cell.addEventListener('click', handleCellClick));
     resetBtn.addEventListener('click', resetGame);
 
     gameModeSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'pvp') {
-            difficultyGroup.style.display = 'none';
-        } else {
-            difficultyGroup.style.display = 'flex';
-        }
+        difficultyGroup.style.display = e.target.value === 'pvp' ? 'none' : 'flex';
         resetGame();
     });
 
