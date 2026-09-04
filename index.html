@@ -4,26 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- GOOGLE SEARCH CONSOLE VERIFICATION TAG -->
     <meta name="google-site-verification" content="AaHfGaSUSRQ9gMqRgly87EAoPqJKbllI99cwG0LF0TU" />
 
-    <title>Tic-Tac-Toe AI - Play Free Online Game</title>
-    <meta name="title" content="Tic-Tac-Toe AI - Play Free Online Game">
-    <meta name="description" content="Play free online Tic-Tac-Toe against an unbeatable Minimax AI or challenge friends locally. Features custom symbols, game stats, themes, and sound effects.">
-    <meta name="keywords" content="tic tac toe, play tic tac toe, tic tac toe ai, free browser games, minimax tic tac toe, 2 player games online">
+    <title>Tic-Tac-Toe AI & Online Multiplayer - Free Online Game</title>
+    <meta name="title" content="Tic-Tac-Toe AI & Online Multiplayer - Free Online Game">
+    <meta name="description" content="Play free online Tic-Tac-Toe against an unbeatable Minimax AI or challenge friends live online with room codes. Features custom symbols, game stats, themes, and sound effects.">
+    <meta name="keywords" content="tic tac toe, play tic tac toe online, tic tac toe multiplayer, tic tac toe ai, free browser games, 2 player online games">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Tic-Tac-Toe Web App">
 
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Tic-Tac-Toe AI - Play Free Online Game">
-    <meta property="og:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
+    <meta property="og:title" content="Tic-Tac-Toe AI & Online Multiplayer">
+    <meta property="og:description" content="Challenge an intelligent AI or play live with friends anywhere using real-time online room codes.">
 
-    <!-- Schema.org JSON-LD Structured Data for Google -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Tic-Tac-Toe AI Game",
+      "name": "Tic-Tac-Toe Online Multiplayer & AI",
       "operatingSystem": "Any",
       "applicationCategory": "GameApplication",
       "offers": {
@@ -34,8 +32,9 @@
     }
     </script>
 
-    <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         :root[data-theme="dark"] {
@@ -80,9 +79,7 @@
             --win-bg: #00ff66;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -116,15 +113,9 @@
             margin-bottom: 1rem;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 1.8rem;
-        }
+        h1 { margin: 0; font-size: 1.8rem; }
 
-        .top-controls {
-            display: flex;
-            gap: 8px;
-        }
+        .top-controls { display: flex; gap: 8px; }
 
         .icon-btn {
             background: var(--button-bg);
@@ -154,19 +145,48 @@
             color: var(--subtext-color);
         }
 
-        select, button {
+        select, button, input {
             padding: 8px 12px;
             border-radius: 6px;
             border: none;
             background-color: var(--button-bg);
             color: var(--text-color);
             font-size: 0.9rem;
-            cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        button:hover, select:hover {
-            background-color: var(--button-hover);
+        button { cursor: pointer; }
+        button:hover, select:hover { background-color: var(--button-hover); }
+
+        /* Online Multiplayer Panel */
+        .online-panel {
+            background-color: var(--button-bg);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .online-inputs {
+            display: flex;
+            gap: 6px;
+        }
+
+        .online-inputs input {
+            flex: 1;
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .online-status {
+            font-size: 0.8rem;
+            color: var(--accent-x);
+            margin: 2px 0 0 0;
+            word-break: break-all;
         }
 
         .scoreboard, .stats-board {
@@ -226,11 +246,8 @@
             transition: background-color 0.2s, transform 0.1s;
         }
 
-        .cell:hover {
-            background-color: var(--cell-hover);
-        }
+        .cell:hover { background-color: var(--cell-hover); }
 
-        /* Pop animation for moves */
         .cell.pop {
             animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -270,7 +287,6 @@
             font-size: 0.85rem;
         }
 
-        /* SEO Article Content Styling */
         .seo-container {
             max-width: 600px;
             width: 100%;
@@ -294,9 +310,7 @@
             color: var(--subtext-color);
         }
 
-        .seo-container ul {
-            padding-left: 1.2rem;
-        }
+        .seo-container ul { padding-left: 1.2rem; }
     </style>
 </head>
 <body>
@@ -316,6 +330,7 @@
             <select id="gameMode">
                 <option value="ai">vs AI</option>
                 <option value="pvp">vs Player (Local)</option>
+                <option value="online">vs Player (Online)</option>
             </select>
         </div>
 
@@ -326,6 +341,15 @@
                 <option value="medium">Medium</option>
                 <option value="hard" selected>Unbeatable</option>
             </select>
+        </div>
+
+        <div class="online-panel" id="onlinePanel">
+            <div class="online-inputs">
+                <button id="createRoomBtn">Host Room</button>
+                <input type="text" id="joinRoomInput" placeholder="Room Code" maxlength="6">
+                <button id="joinRoomBtn">Join</button>
+            </div>
+            <p class="online-status" id="onlineStatus">Select Host or enter Code to Join</p>
         </div>
 
         <div class="control-group">
@@ -373,25 +397,22 @@
     </div>
 </div>
 
-<!-- SEO ARTICLE SECTION FOR GOOGLE INDEXING -->
 <article class="seo-container">
     <h2>Play Free Online Tic-Tac-Toe Game</h2>
-    <p>Enjoy the classic game of Tic-Tac-Toe directly in your browser. Practice your skills against our advanced Minimax Artificial Intelligence algorithm or challenge a friend in local two-player mode.</p>
+    <p>Enjoy the classic game of Tic-Tac-Toe directly in your browser. Practice your skills against our advanced Minimax Artificial Intelligence algorithm, play pass-and-play on a single device, or challenge friends live online with real-time peer-to-peer rooms.</p>
     
-    <h2>How to Play Tic-Tac-Toe</h2>
+    <h2>How to Play Online Multiplayer</h2>
     <ul>
-        <li>The game is played on a 3x3 grid.</li>
-        <li>Players take turns placing their chosen symbols in any empty space.</li>
-        <li>The first player to align three of their symbols horizontally, vertically, or diagonally wins the match.</li>
-        <li>If all nine grid spaces are filled without three symbols aligned, the game ends in a tie.</li>
+        <li>Select <strong>vs Player (Online)</strong> in the mode menu.</li>
+        <li>Click <strong>Host Room</strong> to generate a unique 6-character room code.</li>
+        <li>Share your code with a friend, or have them enter it into the <strong>Room Code</strong> box and click <strong>Join</strong>.</li>
+        <li>Moves automatically sync in real-time between devices!</li>
     </ul>
 
     <h2>Tic-Tac-Toe Winning Strategies</h2>
-    <p>To maximize your chances of winning or securing a draw against any player:</p>
     <ul>
         <li><strong>Claim the Center:</strong> Securing the center cell gives you control over the highest number of winning lines.</li>
         <li><strong>Occupy Corners:</strong> Claiming corners creates double-threat setups, forcing your opponent into defensive blocks.</li>
-        <li><strong>Block Threats:</strong> Pay close attention to your opponent's moves to block them whenever they get two symbols in a row.</li>
     </ul>
 </article>
 
@@ -405,6 +426,12 @@
     const difficultyGroup = document.getElementById('difficultyGroup');
     const symbolSetSelect = document.getElementById('symbolSet');
     
+    const onlinePanel = document.getElementById('onlinePanel');
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const joinRoomInput = document.getElementById('joinRoomInput');
+    const joinRoomBtn = document.getElementById('joinRoomBtn');
+    const onlineStatus = document.getElementById('onlineStatus');
+
     const scoreXEl = document.getElementById('scoreX');
     const scoreOEl = document.getElementById('scoreO');
     const scoreTiesEl = document.getElementById('scoreTies');
@@ -426,6 +453,11 @@
     let scores = { X: 0, O: 0, ties: 0 };
     let stats = { totalGames: 0, playerWins: 0, streak: 0 };
 
+    // Online PeerJS State
+    let peer = null;
+    let conn = null;
+    let myOnlineRole = null; // 'X' or 'O'
+
     const symbolPairs = {
         xo: { X: 'X', O: 'O' },
         fireice: { X: '🔥', O: '❄️' },
@@ -444,7 +476,6 @@
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // Persistent Storage Loader
     function loadStats() {
         const savedStats = localStorage.getItem('ttt_stats');
         if (savedStats) {
@@ -505,9 +536,24 @@
         const index = e.target.getAttribute('data-index');
         if (board[index] !== '' || !isGameActive) return;
 
+        const mode = gameModeSelect.value;
+
+        if (mode === 'online') {
+            if (!conn || !conn.open) {
+                onlineStatus.textContent = "Connect to an online opponent first!";
+                return;
+            }
+            if (currentPlayer !== myOnlineRole) {
+                return; // Not your turn
+            }
+            makeMove(index, currentPlayer);
+            conn.send({ type: 'move', index: index, player: myOnlineRole });
+            return;
+        }
+
         makeMove(index, currentPlayer);
 
-        if (isGameActive && gameModeSelect.value === 'ai' && currentPlayer === 'O') {
+        if (isGameActive && mode === 'ai' && currentPlayer === 'O') {
             setTimeout(makeAIMove, 300);
         }
     }
@@ -532,7 +578,6 @@
             highlightWinningCells(winPattern);
             playSound('win');
             
-            // Confetti Trigger on Player Victory
             if (typeof confetti === 'function') {
                 confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
             }
@@ -670,7 +715,7 @@
         return best ? best.index : getRandomMove();
     }
 
-    function resetGame() {
+    function resetGame(notifyPeer = true) {
         board = ['', '', '', '', '', '', '', '', ''];
         currentPlayer = 'X';
         isGameActive = true;
@@ -678,6 +723,101 @@
         cells.forEach(cell => {
             cell.textContent = '';
             cell.classList.remove('x', 'o', 'winner', 'pop');
+        });
+
+        if (notifyPeer && gameModeSelect.value === 'online' && conn && conn.open) {
+            conn.send({ type: 'reset' });
+        }
+    }
+
+    // --- Online Multiplayer Logic (PeerJS) ---
+    function generateRoomCode() {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    function setupPeerConnection() {
+        if (peer) peer.destroy();
+
+        peer = new Peer();
+
+        peer.on('open', (id) => {
+            onlineStatus.textContent = "Ready to host or join a room.";
+        });
+
+        peer.on('connection', (connection) => {
+            conn = connection;
+            myOnlineRole = 'X';
+            onlineStatus.textContent = "Opponent connected! You are Player X.";
+            setupDataHandlers();
+            resetGame(false);
+        });
+
+        peer.on('error', (err) => {
+            onlineStatus.textContent = "Connection error. Try again.";
+        });
+    }
+
+    createRoomBtn.addEventListener('click', () => {
+        const roomId = "TTT36-" + generateRoomCode();
+        if (peer) peer.destroy();
+
+        peer = new Peer(roomId);
+        onlineStatus.textContent = "Creating room...";
+
+        peer.on('open', () => {
+            const displayCode = roomId.replace("TTT36-", "");
+            onlineStatus.textContent = `Room Code: ${displayCode} (Share with friend!)`;
+            myOnlineRole = 'X';
+        });
+
+        peer.on('connection', (connection) => {
+            conn = connection;
+            onlineStatus.textContent = "Opponent connected! Game started. You are X.";
+            setupDataHandlers();
+            resetGame(false);
+        });
+    });
+
+    joinRoomBtn.addEventListener('click', () => {
+        const rawCode = joinRoomInput.value.trim().toUpperCase();
+        if (rawCode.length < 4) {
+            onlineStatus.textContent = "Enter a valid Room Code.";
+            return;
+        }
+
+        const roomId = "TTT36-" + rawCode;
+        if (peer) peer.destroy();
+
+        peer = new Peer();
+
+        peer.on('open', () => {
+            onlineStatus.textContent = "Connecting to room...";
+            conn = peer.connect(roomId);
+
+            conn.on('open', () => {
+                myOnlineRole = 'O';
+                onlineStatus.textContent = "Connected! Game started. You are O.";
+                setupDataHandlers();
+                resetGame(false);
+            });
+
+            conn.on('error', () => {
+                onlineStatus.textContent = "Failed to connect to room code.";
+            });
+        });
+    });
+
+    function setupDataHandlers() {
+        conn.on('data', (data) => {
+            if (data.type === 'move') {
+                makeMove(data.index, data.player);
+            } else if (data.type === 'reset') {
+                resetGame(false);
+            }
+        });
+
+        conn.on('close', () => {
+            onlineStatus.textContent = "Opponent disconnected.";
         });
     }
 
@@ -705,10 +845,17 @@
     });
 
     cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-    resetBtn.addEventListener('click', resetGame);
+    resetBtn.addEventListener('click', () => resetGame(true));
 
     gameModeSelect.addEventListener('change', (e) => {
-        difficultyGroup.style.display = e.target.value === 'pvp' ? 'none' : 'flex';
+        const val = e.target.value;
+        difficultyGroup.style.display = val === 'ai' ? 'flex' : 'none';
+        onlinePanel.style.display = val === 'online' ? 'flex' : 'none';
+
+        if (val === 'online') {
+            setupPeerConnection();
+        }
+
         resetGame();
     });
 
