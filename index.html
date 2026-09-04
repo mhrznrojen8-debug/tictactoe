@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- GOOGLE SEARCH CONSOLE VERIFICATION TAG -->
+    <meta name="google-site-verification" content="AaHfGaSUSRQ9gMqRgly87EAoPqJKbllI99cwG0LF0TU" />
+
     <title>Tic-Tac-Toe AI - Play Free Online Game</title>
     <meta name="title" content="Tic-Tac-Toe AI - Play Free Online Game">
-    <meta name="description" content="Play free online Tic-Tac-Toe game against an unbeatable AI or challenge friends locally. Features score tracking, themes, sound effects, and multiple difficulty levels.">
+    <meta name="description" content="Play free online Tic-Tac-Toe against an unbeatable Minimax AI or challenge friends locally. Features custom symbols, game stats, themes, and sound effects.">
     <meta name="keywords" content="tic tac toe, play tic tac toe, tic tac toe ai, free browser games, minimax tic tac toe, 2 player games online">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Tic-Tac-Toe Web App">
@@ -14,6 +17,25 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Tic-Tac-Toe AI - Play Free Online Game">
     <meta property="og:description" content="Challenge an intelligent AI or play with a friend locally in this modern browser-based Tic-Tac-Toe game.">
+
+    <!-- Schema.org JSON-LD Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Tic-Tac-Toe AI Game",
+      "operatingSystem": "Any",
+      "applicationCategory": "GameApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root[data-theme="dark"] {
@@ -27,6 +49,7 @@
             --button-hover: #475569;
             --cell-bg: #0f172a;
             --cell-hover: #1e293b;
+            --win-bg: #166534;
         }
 
         :root[data-theme="light"] {
@@ -40,6 +63,7 @@
             --button-hover: #94a3b8;
             --cell-bg: #f1f5f9;
             --cell-hover: #e2e8f0;
+            --win-bg: #86efac;
         }
 
         :root[data-theme="neon"] {
@@ -53,6 +77,7 @@
             --button-hover: #333333;
             --cell-bg: #000000;
             --cell-hover: #1a1a1a;
+            --win-bg: #00ff66;
         }
 
         * {
@@ -64,7 +89,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             margin: 0;
@@ -78,9 +103,10 @@
             border-radius: 1rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
             text-align: center;
-            max-width: 420px;
+            max-width: 440px;
             width: 100%;
             transition: background-color 0.3s;
+            position: relative;
         }
 
         .header {
@@ -143,24 +169,24 @@
             background-color: var(--button-hover);
         }
 
-        .scoreboard {
+        .scoreboard, .stats-board {
             display: flex;
             justify-content: space-around;
             background-color: var(--button-bg);
             padding: 10px;
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
-        .score-item {
+        .score-item, .stat-item {
             display: flex;
             flex-direction: column;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--subtext-color);
         }
 
-        .score-item span {
-            font-size: 1.2rem;
+        .score-item span, .stat-item span {
+            font-size: 1.1rem;
             font-weight: bold;
             color: var(--text-color);
         }
@@ -168,8 +194,13 @@
         .status {
             font-size: 1.2rem;
             font-weight: 600;
-            margin: 1rem 0;
+            margin: 0.75rem 0;
             height: 1.5rem;
+        }
+
+        .board-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
         }
 
         .board {
@@ -179,7 +210,6 @@
             background-color: var(--button-bg);
             padding: 10px;
             border-radius: 12px;
-            margin-bottom: 1.5rem;
         }
 
         .cell {
@@ -200,8 +230,23 @@
             background-color: var(--cell-hover);
         }
 
+        /* Pop animation for moves */
+        .cell.pop {
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         .cell.x { color: var(--accent-x); }
         .cell.o { color: var(--accent-o); }
+
+        .cell.winner {
+            background-color: var(--win-bg);
+            transform: scale(1.03);
+        }
 
         .action-btns {
             display: flex;
@@ -225,11 +270,32 @@
             font-size: 0.85rem;
         }
 
-        .seo-text {
-            font-size: 0.75rem;
+        /* SEO Article Content Styling */
+        .seo-container {
+            max-width: 600px;
+            width: 100%;
+            margin-top: 2rem;
+            color: var(--text-color);
+            line-height: 1.6;
+            text-align: left;
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .seo-container h2 {
+            font-size: 1.3rem;
+            margin-top: 1rem;
+            color: var(--accent-x);
+        }
+
+        .seo-container p, .seo-container ul {
+            font-size: 0.9rem;
             color: var(--subtext-color);
-            margin-top: 1.5rem;
-            line-height: 1.4;
+        }
+
+        .seo-container ul {
+            padding-left: 1.2rem;
         }
     </style>
 </head>
@@ -261,37 +327,73 @@
                 <option value="hard" selected>Unbeatable</option>
             </select>
         </div>
+
+        <div class="control-group">
+            <label for="symbolSet">Symbols:</label>
+            <select id="symbolSet">
+                <option value="xo">Classic (X / O)</option>
+                <option value="fireice">Fire / Ice (🔥 / ❄️)</option>
+                <option value="animals">Cat / Dog (🐱 / 🐶)</option>
+                <option value="space">Star / Moon (⭐️ / 🌙)</option>
+            </select>
+        </div>
     </div>
 
     <div class="scoreboard">
-        <div class="score-item">Player X <span id="scoreX">0</span></div>
+        <div class="score-item"><span id="labelX">X</span> <span id="scoreX">0</span></div>
         <div class="score-item">Ties <span id="scoreTies">0</span></div>
-        <div class="score-item">Player O <span id="scoreO">0</span></div>
+        <div class="score-item"><span id="labelO">O</span> <span id="scoreO">0</span></div>
+    </div>
+
+    <div class="stats-board">
+        <div class="stat-item">Games <span id="statTotal">0</span></div>
+        <div class="stat-item">Win Rate <span id="statWinRate">0%</span></div>
+        <div class="stat-item">Streak <span id="statStreak">0</span></div>
     </div>
 
     <div class="status" id="status">Player X's Turn</div>
 
-    <div class="board" id="board">
-        <div class="cell" data-index="0"></div>
-        <div class="cell" data-index="1"></div>
-        <div class="cell" data-index="2"></div>
-        <div class="cell" data-index="3"></div>
-        <div class="cell" data-index="4"></div>
-        <div class="cell" data-index="5"></div>
-        <div class="cell" data-index="6"></div>
-        <div class="cell" data-index="7"></div>
-        <div class="cell" data-index="8"></div>
+    <div class="board-wrapper">
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
     </div>
 
     <div class="action-btns">
         <button class="reset-btn" id="resetBtn">Restart Game</button>
-        <button class="reset-score-btn" id="resetScoreBtn">Reset Score</button>
+        <button class="reset-score-btn" id="resetScoreBtn">Reset Stats</button>
     </div>
-
-    <p class="seo-text">
-        Play free online Tic-Tac-Toe with customizable themes, session score tracking, and an intelligent Minimax AI opponent.
-    </p>
 </div>
+
+<!-- SEO ARTICLE SECTION FOR GOOGLE INDEXING -->
+<article class="seo-container">
+    <h2>Play Free Online Tic-Tac-Toe Game</h2>
+    <p>Enjoy the classic game of Tic-Tac-Toe directly in your browser. Practice your skills against our advanced Minimax Artificial Intelligence algorithm or challenge a friend in local two-player mode.</p>
+    
+    <h2>How to Play Tic-Tac-Toe</h2>
+    <ul>
+        <li>The game is played on a 3x3 grid.</li>
+        <li>Players take turns placing their chosen symbols in any empty space.</li>
+        <li>The first player to align three of their symbols horizontally, vertically, or diagonally wins the match.</li>
+        <li>If all nine grid spaces are filled without three symbols aligned, the game ends in a tie.</li>
+    </ul>
+
+    <h2>Tic-Tac-Toe Winning Strategies</h2>
+    <p>To maximize your chances of winning or securing a draw against any player:</p>
+    <ul>
+        <li><strong>Claim the Center:</strong> Securing the center cell gives you control over the highest number of winning lines.</li>
+        <li><strong>Occupy Corners:</strong> Claiming corners creates double-threat setups, forcing your opponent into defensive blocks.</li>
+        <li><strong>Block Threats:</strong> Pay close attention to your opponent's moves to block them whenever they get two symbols in a row.</li>
+    </ul>
+</article>
 
 <script>
     const cells = document.querySelectorAll('.cell');
@@ -301,10 +403,18 @@
     const gameModeSelect = document.getElementById('gameMode');
     const difficultySelect = document.getElementById('difficulty');
     const difficultyGroup = document.getElementById('difficultyGroup');
+    const symbolSetSelect = document.getElementById('symbolSet');
     
     const scoreXEl = document.getElementById('scoreX');
     const scoreOEl = document.getElementById('scoreO');
     const scoreTiesEl = document.getElementById('scoreTies');
+    const labelXEl = document.getElementById('labelX');
+    const labelOEl = document.getElementById('labelO');
+
+    const statTotalEl = document.getElementById('statTotal');
+    const statWinRateEl = document.getElementById('statWinRate');
+    const statStreakEl = document.getElementById('statStreak');
+
     const themeBtn = document.getElementById('themeBtn');
     const soundBtn = document.getElementById('soundBtn');
 
@@ -314,6 +424,15 @@
     let soundEnabled = true;
     
     let scores = { X: 0, O: 0, ties: 0 };
+    let stats = { totalGames: 0, playerWins: 0, streak: 0 };
+
+    const symbolPairs = {
+        xo: { X: 'X', O: 'O' },
+        fireice: { X: '🔥', O: '❄️' },
+        animals: { X: '🐱', O: '🐶' },
+        space: { X: '⭐️', O: '🌙' }
+    };
+
     const themes = ['dark', 'light', 'neon'];
     let currentThemeIdx = 0;
 
@@ -324,6 +443,27 @@
     ];
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Persistent Storage Loader
+    function loadStats() {
+        const savedStats = localStorage.getItem('ttt_stats');
+        if (savedStats) {
+            stats = JSON.parse(savedStats);
+            updateStatsUI();
+        }
+    }
+
+    function saveStats() {
+        localStorage.setItem('ttt_stats', JSON.stringify(stats));
+        updateStatsUI();
+    }
+
+    function updateStatsUI() {
+        statTotalEl.textContent = stats.totalGames;
+        const rate = stats.totalGames > 0 ? Math.round((stats.playerWins / stats.totalGames) * 100) : 0;
+        statWinRateEl.textContent = `${rate}%`;
+        statStreakEl.textContent = stats.streak;
+    }
     
     function playSound(type) {
         if (!soundEnabled) return;
@@ -372,18 +512,39 @@
         }
     }
 
+    function getActiveSymbol(player) {
+        const setKey = symbolSetSelect.value;
+        return symbolPairs[setKey][player];
+    }
+
     function makeMove(index, player) {
         board[index] = player;
-        cells[index].textContent = player;
-        cells[index].classList.add(player.toLowerCase());
+        cells[index].textContent = getActiveSymbol(player);
+        cells[index].classList.add(player.toLowerCase(), 'pop');
         playSound('move');
 
-        if (checkWin(board, player)) {
-            statusElement.textContent = `Player ${player} Wins!`;
+        const winPattern = checkWinPattern(board, player);
+        if (winPattern) {
+            statusElement.textContent = `Player ${getActiveSymbol(player)} Wins!`;
             isGameActive = false;
             scores[player]++;
             updateScoreUI();
+            highlightWinningCells(winPattern);
             playSound('win');
+            
+            // Confetti Trigger on Player Victory
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+            }
+
+            stats.totalGames++;
+            if (player === 'X') {
+                stats.playerWins++;
+                stats.streak++;
+            } else {
+                stats.streak = 0;
+            }
+            saveStats();
             return;
         }
 
@@ -393,17 +554,37 @@
             scores.ties++;
             updateScoreUI();
             playSound('draw');
+
+            stats.totalGames++;
+            stats.streak = 0;
+            saveStats();
             return;
         }
 
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        statusElement.textContent = `Player ${currentPlayer}'s Turn`;
+        statusElement.textContent = `Player ${getActiveSymbol(currentPlayer)}'s Turn`;
+    }
+
+    function highlightWinningCells(pattern) {
+        pattern.forEach(idx => {
+            cells[idx].classList.add('winner');
+        });
     }
 
     function updateScoreUI() {
         scoreXEl.textContent = scores.X;
         scoreOEl.textContent = scores.O;
         scoreTiesEl.textContent = scores.ties;
+    }
+
+    function updateSymbolLabels() {
+        labelXEl.textContent = getActiveSymbol('X');
+        labelOEl.textContent = getActiveSymbol('O');
+        cells.forEach((cell, idx) => {
+            if (board[idx] !== '') {
+                cell.textContent = getActiveSymbol(board[idx]);
+            }
+        });
     }
 
     function makeAIMove() {
@@ -427,6 +608,15 @@
         const availableSpots = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
         if (availableSpots.length === 0) return null;
         return availableSpots[Math.floor(Math.random() * availableSpots.length)];
+    }
+
+    function checkWinPattern(currentBoard, player) {
+        for (let pattern of winPatterns) {
+            if (pattern.every(index => currentBoard[index] === player)) {
+                return pattern;
+            }
+        }
+        return null;
     }
 
     function checkWin(currentBoard, player) {
@@ -484,10 +674,10 @@
         board = ['', '', '', '', '', '', '', '', ''];
         currentPlayer = 'X';
         isGameActive = true;
-        statusElement.textContent = "Player X's Turn";
+        statusElement.textContent = `Player ${getActiveSymbol('X')}'s Turn`;
         cells.forEach(cell => {
             cell.textContent = '';
-            cell.classList.remove('x', 'o');
+            cell.classList.remove('x', 'o', 'winner', 'pop');
         });
     }
 
@@ -503,7 +693,15 @@
 
     resetScoreBtn.addEventListener('click', () => {
         scores = { X: 0, O: 0, ties: 0 };
+        stats = { totalGames: 0, playerWins: 0, streak: 0 };
+        localStorage.removeItem('ttt_stats');
         updateScoreUI();
+        updateStatsUI();
+    });
+
+    symbolSetSelect.addEventListener('change', () => {
+        updateSymbolLabels();
+        statusElement.textContent = `Player ${getActiveSymbol(currentPlayer)}'s Turn`;
     });
 
     cells.forEach(cell => cell.addEventListener('click', handleCellClick));
@@ -515,6 +713,10 @@
     });
 
     difficultySelect.addEventListener('change', resetGame);
+
+    // Initial Setup
+    loadStats();
+    updateSymbolLabels();
 </script>
 </body>
 </html>
